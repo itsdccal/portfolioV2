@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif, Archivo_Black } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,10 +19,25 @@ const instrumentSerif = Instrument_Serif({
   style: ["normal", "italic"],
 });
 
+// Heavy display face for macro-typography (brutalist skill):
+// massive section headings with tight tracking.
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
-  title: "Andi Muh Haikal Lukman — Web Developer",
+  title: "Andi Muh Haikal Lukman — Full Stack Developer",
   description:
-    "Portfolio of Andi Muh Haikal Lukman, a Web Developer focused on backend development, based in Makassar, Indonesia.",
+    "Portfolio of Andi Muh Haikal Lukman, a Full Stack Developer based in Makassar, Indonesia.",
+  openGraph: {
+    title: "Andi Muh Haikal Lukman — Full Stack Developer",
+    description:
+      "Full Stack Developer based in Makassar, Indonesia.",
+    type: "website",
+    images: ["/images/hero-wide.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${archivoBlack.variable} bg-background text-foreground antialiased`}
       >
         {children}
       </body>

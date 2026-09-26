@@ -8,7 +8,10 @@ const links = [
   { href: "#about", label: "About" },
   { href: "#stack", label: "Stack" },
   { href: "#projects", label: "Projects" },
+  // TODO(archive): add { href: "#archive", label: "Archive" } once
+  // profile.archive has entries — the section renders null while it's empty.
   { href: "#roadmap", label: "Roadmap" },
+  { href: "#certifications", label: "Certifications" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -28,12 +31,23 @@ export default function Navbar() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-foreground"
+                data-cursor
+                className="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent"
               >
                 {link.label}
               </a>
             </li>
           ))}
+          <li>
+            <a
+              href={profile.cv}
+              download
+              data-cursor="CV"
+              className="border border-accent px-4 py-2 font-mono text-xs uppercase tracking-widest text-accent transition-colors hover:bg-accent hover:text-background"
+            >
+              Resume
+            </a>
+          </li>
         </ul>
 
         <button
@@ -64,12 +78,23 @@ export default function Navbar() {
                 <a
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block px-6 py-4 font-mono text-sm uppercase tracking-widest text-muted transition-colors hover:text-foreground"
+                  data-cursor
+                  className="block px-6 py-4 font-mono text-sm uppercase tracking-widest text-muted transition-colors hover:text-accent"
                 >
                   {link.label}
                 </a>
               </li>
             ))}
+            <li>
+              <a
+                href={profile.cv}
+                download
+                onClick={() => setOpen(false)}
+                className="block border-t border-border px-6 py-4 font-mono text-sm uppercase tracking-widest text-accent"
+              >
+                Download Resume
+              </a>
+            </li>
           </motion.ul>
         )}
       </AnimatePresence>

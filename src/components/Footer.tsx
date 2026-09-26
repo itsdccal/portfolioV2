@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { profile } from "@/data/profile";
+import { cn } from "@/lib/utils";
 
 const ease = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -29,27 +31,95 @@ function GithubIcon() {
   );
 }
 
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <rect width="14" height="14" x="8" y="8" rx="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </svg>
+  );
+}
+
 const socials = [
+  { label: "LinkedIn", href: profile.linkedin, icon: <LinkedInIcon /> },
+  { label: "Instagram", href: "https://instagram.com/itsdccal", icon: <InstagramIcon /> },
+  { label: "GitHub", href: "https://github.com/itsdccal", icon: <GithubIcon /> },
+];
+
+const channels = [
+  {
+    label: "Email",
+    value: profile.email,
+    href: `mailto:${profile.email}`,
+    external: false,
+  },
   {
     label: "LinkedIn",
+    value: "andimuhhaikal",
     href: profile.linkedin,
-    icon: <LinkedInIcon />,
+    external: true,
   },
   {
-    label: "Instagram",
-    href: "https://instagram.com/itsdccal",
-    icon: <InstagramIcon />,
-  },
-  {
-    label: "GitHub",
-    href: "https://github.com/itsdccal",
-    icon: <GithubIcon />,
+    label: "Phone / WA",
+    value: profile.phone,
+    href: `tel:+62${profile.phone.slice(1)}`,
+    external: false,
   },
 ];
 
 export default function Footer() {
+  const [time, setTime] = useState("--:--:--");
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: profile.timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+    const tick = () => setTime(formatter.format(new Date()));
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+    };
+  }, []);
+
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = profile.email;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    setCopied(true);
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <footer className="relative overflow-hidden">
+    <footer id="contact" className="relative overflow-hidden">
       {/* CTA block with looping video background */}
       <div className="relative">
         <video
@@ -63,47 +133,148 @@ export default function Footer() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background/80" />
 
-        <div className="relative mx-auto flex max-w-6xl flex-col items-center px-6 py-32 text-center md:py-44">
-          <motion.span
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+        <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-24 md:pb-32 md:pt-32">
+          {/* Telemetry strip: chapter, live clock, availability, location */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
-            className="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-muted"
+            className="mb-16 flex flex-wrap items-center justify-between gap-3 border-y border-border py-3 font-mono text-[11px] uppercase tracking-widest"
           >
-            [006] — What&apos;s next
-          </motion.span>
+            <span className="text-accent">[007] — Contact</span>
+            <span className="flex items-center gap-3">
+              <span className="text-muted">Local time</span>
+              <span className="tabular-nums text-foreground">{time}</span>
+              <span className="hidden text-muted sm:inline">{profile.timezone}</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+              <span>{profile.availability}</span>
+            </span>
+          </motion.div>
 
+          {/* Macro-typography statement */}
           <motion.h2
-            initial={{ opacity: 0, y: 32 }}
+            initial={{ opacity: 0, y: 48 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.1, ease }}
-            className="max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight md:text-7xl"
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.9, ease }}
+            className="font-display uppercase leading-[0.9] tracking-[-0.02em]"
           >
-            Have an idea?
-            <br />
-            Let&apos;s build it together.
+            <span className="block text-[clamp(2.75rem,9vw,8rem)]">
+              Have an idea?
+            </span>
+            <span className="mt-2 block text-[clamp(2.75rem,9vw,8rem)] text-accent">
+              Let&apos;s build it
+              <span aria-hidden> →</span>
+            </span>
           </motion.h2>
 
-          <motion.a
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.15, ease }}
+            className="mt-8 max-w-xl text-lg leading-relaxed text-muted"
+          >
+            Whether we start fresh to bring a project to life or take an
+            existing system further — my inbox is always open.
+          </motion.p>
+
+          {/* Email CTA + copy */}
+          <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.25, ease }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            href={`mailto:${profile.email}`}
-            className="mt-10 inline-block border border-foreground bg-foreground px-8 py-4 font-mono text-xs uppercase tracking-widest text-background transition-colors hover:bg-transparent hover:text-foreground"
+            className="mt-10 flex flex-wrap items-center gap-3"
           >
-            {profile.email}
-          </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href={`mailto:${profile.email}`}
+              data-cursor="SAY HELLO"
+              className="inline-block border border-accent bg-accent px-8 py-4 font-mono text-xs uppercase tracking-widest text-background transition-colors hover:bg-transparent hover:text-accent"
+            >
+              {profile.email}
+            </motion.a>
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href={profile.cv}
+              download
+              data-cursor="CV"
+              className="inline-flex items-center gap-2 border border-border px-8 py-4 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-accent hover:text-accent"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <path d="m7 10 5 5 5-5" />
+                <path d="M12 15V3" />
+              </svg>
+              Download CV
+            </motion.a>
+            <button
+              type="button"
+              onClick={copyEmail}
+              data-cursor
+              className={cn(
+                "flex items-center gap-2 border px-5 py-4 font-mono text-xs uppercase tracking-widest transition-colors",
+                copied
+                  ? "border-accent bg-accent text-background"
+                  : "border-border text-muted hover:border-accent hover:text-accent"
+              )}
+            >
+              {copied ? <CheckIcon /> : <CopyIcon />}
+              <span>{copied ? "Copied" : "Copy"}</span>
+            </button>
+          </motion.div>
 
+          {/* Channel links */}
+          <motion.ul
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.35, ease }}
+            className="mt-16 grid gap-px border border-border bg-border sm:grid-cols-3"
+          >
+            {channels.map((channel) => (
+              <li key={channel.label} className="bg-background/90">
+                <a
+                  href={channel.href}
+                  {...(channel.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  data-cursor
+                  className="group flex h-full flex-col gap-2 p-6 transition-colors hover:bg-accent hover:text-background"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted transition-colors group-hover:text-background/70">
+                    {channel.label}
+                  </span>
+                  <span className="break-all font-mono text-sm font-semibold transition-transform duration-200 group-hover:translate-x-1">
+                    {channel.value}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </motion.ul>
+
+          {/* Socials */}
           <motion.ul
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.8, delay: 0.45 }}
             className="mt-14 flex items-center gap-4"
           >
             {socials.map((social) => (
@@ -115,7 +286,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="flex h-12 w-12 items-center justify-center rounded-full border border-foreground/30 text-foreground/80 backdrop-blur-sm transition-colors hover:border-foreground hover:bg-foreground hover:text-background"
+                  className="flex h-12 w-12 items-center justify-center rounded-full border border-foreground/30 text-foreground/80 backdrop-blur-sm transition-colors hover:border-accent hover:bg-accent hover:text-background"
                 >
                   {social.icon}
                 </motion.a>
